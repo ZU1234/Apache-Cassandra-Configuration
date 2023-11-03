@@ -1,29 +1,31 @@
 package com.core.model;
 
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
-import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
+
 @Table("users")
 public class UserModel implements Serializable {
-
-
-    @PrimaryKeyColumn(name = "pk",ordinal = 0,type = PrimaryKeyType.PARTITIONED)
     @Column("pk")
+    @PrimaryKey
     private UUID pk;
     @Column("fullname")
     private String fullname;
     @Column("email")
+    @Indexed
     private String email;
     @Column("password")
     private String password;
     @Column("startDate")
     private Date startDate;
+
+    public UserModel() {
+        this.pk=UUID.randomUUID();
+    }
 
     public UUID getPk() {
         return pk;
@@ -65,3 +67,4 @@ public class UserModel implements Serializable {
         this.startDate = startDate;
     }
 }
+

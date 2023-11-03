@@ -6,7 +6,6 @@ import com.core.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,27 +17,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModel save(String fullName, String email, String password) {
-        userDao.save(fullName, email, password);
-        return null;
+        return userDao.save(fullName, email, password);
     }
-
     @Override
     public List<UserModel> getAllUsers() {
         return userDao.getAll();
     }
-
     @Override
-    public UserModel getUserById(UUID pk) {
-        return null;
+    public UserModel getByEmail(String email) {
+        return userDao.getByEmail(email);
     }
-
     @Override
-    public void updateUser(UserModel userModel) {
-
-    }
-
-    @Override
-    public void deleteUser(UUID pk) {
-
+    public List<UserModel> getUsersByEmail(String email){
+        return userDao.getUsersByEmail(email);
     }
 }

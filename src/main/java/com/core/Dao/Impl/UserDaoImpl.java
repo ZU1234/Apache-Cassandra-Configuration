@@ -3,39 +3,33 @@ package com.core.Dao.Impl;
 import com.core.Dao.UserDao;
 import com.core.model.UserModel;
 import com.core.repository.UserModelRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.data.cassandra.core.CassandraOperations;
+import org.springframework.data.cassandra.core.CassandraTemplate;
+import org.springframework.data.cassandra.core.query.Criteria;
+import org.springframework.data.cassandra.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserDaoImpl implements UserDao {
-private UserModelRepository userModelRepository;
-@Autowired
-    public UserDaoImpl(UserModelRepository userModelRepository) {
+    private final UserModelRepository userModelRepository;
+    private final CassandraTemplate cassandraTemplate;
+    private final CassandraOperations cassandraOperations;
+
+    public UserDaoImpl(UserModelRepository userModelRepository, CassandraTemplate cassandraTemplate, CassandraOperations cassandraOperations) {
         this.userModelRepository = userModelRepository;
+        this.cassandraTemplate = cassandraTemplate;
+        this.cassandraOperations = cassandraOperations;
     }
+
     @Override
     public UserModel save(String fullName, String email, String password) {
-        UserModel user=new UserModel();
-        user.setPk(UUID.randomUUID());
+        UserModel user = new UserModel();
         user.setFullname(fullName);
         user.setEmail(email);
         user.setPassword(password);
-        System.out.printf(String.valueOf(userModelRepository.save(user)));
-        return userModelRepository.save(user);
-    }
-
-    @Override
-    public UserModel findByPk(String pk) {
-        return null;
-    }
-
-    @Override
-    public UserModel findByUid(String uid) {
-        return null;
+        return cassandraOperations.insert(user);
     }
 
     @Override
@@ -44,7 +38,14 @@ private UserModelRepository userModelRepository;
     }
 
     @Override
-    public List<UserModel> remove(String pk) {
-        return null;
+    public UserModel getByEmail(String email) {
+        Query query = Query.query(Criteria.where("email").is(email));
+        return cassandraTemplate.selectOne(query, UserModel.class);
+    }
+
+    @Override
+    public List<UserModel> getUsersByEmail(String email) {
+        Query query = Query.query(Criteria.where("email").is(email));
+        return cassandraTemplate.select(query, UserModel.class);
     }
 }
